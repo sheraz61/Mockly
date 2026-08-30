@@ -4,12 +4,13 @@ import cors from 'cors';
 import userRoute from './routes/user.routes.js';
 import interviewRoutes from './routes/interview.routes.js';
 import dashboardRoutes from './routes/dashboard.routes.js';
+import errorMiddleware from './middelwares/error.js';
 
 const app = express();
 
 // CORS configuration
 app.use(cors({
-  origin: 'https://interview-p.vercel.app',
+  origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Authorization', 'X-Refresh-Token', 'Content-Type'],
   credentials: true
@@ -28,5 +29,8 @@ app.get('/', (req, res) => {
 app.use('/api/v1/user', userRoute);
 app.use('/api/v1/interview', interviewRoutes);
 app.use('/api/v1/dashboard', dashboardRoutes);
+
+// Global Error Middleware
+app.use(errorMiddleware);
 
 export { app };
