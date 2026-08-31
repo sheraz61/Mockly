@@ -1,7 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import api from '../../utils/axios';
+import Backend_URL from '../../server';
 
-const API_URL = 'https://interviewprep.up.railway.app/api/v1/user';
+const API_URL = `${Backend_URL}/api/v1/user`;
 
 // Get user's own profile
 export const getMyProfile = createAsyncThunk(
@@ -9,7 +10,7 @@ export const getMyProfile = createAsyncThunk(
   async ( { rejectWithValue }) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`${API_URL}/my-profile`, {
+      const response = await api.get(`${API_URL}/my-profile`, {
         headers: { 
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -29,7 +30,7 @@ export const getUserProfile = createAsyncThunk(
   'profile/getUserProfile',
   async (userId, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${API_URL}/profile/${userId}`);
+      const response = await api.get(`${API_URL}/profile/${userId}`);
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -45,7 +46,7 @@ export const updateProfile = createAsyncThunk(
   async (profileData, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.put(`${API_URL}/profile`, profileData, {
+      const response = await api.put(`${API_URL}/profile`, profileData, {
         headers: { 
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'

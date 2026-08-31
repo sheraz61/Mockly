@@ -11,9 +11,12 @@ import ViewProfile from './pages/ViewProfile'
 import UserProfile from './pages/UserProfile'
 import InterviewSession from './pages/InterviewSession';
 import InterviewResults from './pages/InterviewResults';
+import { Toaster } from 'react-hot-toast';
+
 function App() {
   return (
     <Router>
+      <Toaster position="top-center" reverseOrder={false} />
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />

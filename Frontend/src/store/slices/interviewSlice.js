@@ -1,8 +1,9 @@
 // store/slices/interviewSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import api from '../../utils/axios';
+import Backend_URL from '../../server';
 
-const API_URL = 'https://interviewprep.up.railway.app/api/v1/interview';
+const API_URL = `${Backend_URL}/api/v1/interview`;
 
 // Start new interview
 export const startInterview = createAsyncThunk(
@@ -10,7 +11,7 @@ export const startInterview = createAsyncThunk(
   async (interviewData, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post(`${API_URL}/start`, interviewData, {
+      const response = await api.post(`${API_URL}/start`, interviewData, {
         headers: { 
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -31,7 +32,7 @@ export const submitAnswer = createAsyncThunk(
   async ({ interviewId, answer }, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post(
+      const response = await api.post(
         `${API_URL}/submit/${interviewId}`, // Changed to match backend
         { answer }, 
         {
@@ -56,7 +57,7 @@ export const getResults = createAsyncThunk(
   async (interviewId, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`${API_URL}/results/${interviewId}`, {
+      const response = await api.get(`${API_URL}/results/${interviewId}`, {
         headers: { 
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
