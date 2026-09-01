@@ -6,7 +6,7 @@
 export const verificationEmailTemplate = (verificationCode) => {
   return `
   <div style="font-family: Arial, sans-serif; background-color: #ffffff; padding: 20px; text-align: center; border: 1px solid #000000; border-radius: 8px; max-width: 500px; margin: auto;">
-    <h2 style="color: #000000; margin-bottom: 10px;">InterviewPrep</h2>
+    <h2 style="color: #000000; margin-bottom: 10px;">Mockly</h2>
     <p style="color: #333333; font-size: 16px; margin-bottom: 20px;">
       Please verify your email to complete registration.
     </p>
@@ -19,7 +19,7 @@ export const verificationEmailTemplate = (verificationCode) => {
     </p>
     <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
     <p style="color: #888888; font-size: 12px;">
-      &copy; ${new Date().getFullYear()} InterviewPrep. All rights reserved.
+      &copy; ${new Date().getFullYear()} Mockly. All rights reserved.
     </p>
   </div>
   `;
@@ -36,7 +36,7 @@ export const verificationEmailTemplate = (verificationCode) => {
 export const baseEmailTemplate = ({ title, message, highlightText = "" }) => {
   return `
   <div style="font-family: Arial, sans-serif; background-color: #ffffff; padding: 20px; text-align: center; border: 1px solid #000000; border-radius: 8px; max-width: 500px; margin: auto;">
-    <h2 style="color: #000000; margin-bottom: 10px;">${title || "InterviewPrep"}</h2>
+    <h2 style="color: #000000; margin-bottom: 10px;">${title || "Mockly"}</h2>
     <p style="color: #333333; font-size: 16px; margin-bottom: 20px;">
       ${message}
     </p>
@@ -49,7 +49,7 @@ export const baseEmailTemplate = ({ title, message, highlightText = "" }) => {
     }
     <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
     <p style="color: #888888; font-size: 12px;">
-      &copy; ${new Date().getFullYear()} InterviewPrep. All rights reserved.
+      &copy; ${new Date().getFullYear()} Mockly. All rights reserved.
     </p>
   </div>
   `;

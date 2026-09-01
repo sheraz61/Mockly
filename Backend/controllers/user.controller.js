@@ -52,7 +52,7 @@ export const registerUser = catchAsyncError(async (req, res, next) => {
     try {
         await sendEmail(
             user.email,
-            "InterviewPrep - Activate your account",
+            "Mockly - Activate your account",
             verificationEmailTemplate(activationCode)
         );
 

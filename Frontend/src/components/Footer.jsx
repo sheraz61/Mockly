@@ -23,7 +23,7 @@ const Footer = () => {
               </div>
               <div className="leading-none">
                 <span className="text-lg font-bold text-slate-900 tracking-tight block">
-                  Ascend
+                  Mockly
                 </span>
                 <span className="text-[11px] text-slate-400 font-medium tracking-wide">
                   INTERVIEW COACHING
@@ -129,7 +129,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="border-t border-slate-200 pt-8 mt-12 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-slate-500 text-sm text-center md:text-left">
-            © {new Date().getFullYear()} Ascend. All rights reserved. Crafted with ❤️ for job seekers worldwide.
+            © {new Date().getFullYear()} Mockly. All rights reserved. Crafted with ❤️ for job seekers worldwide.
           </p>
           <div className="flex space-x-6 text-sm text-slate-500">
             <a href="#" className="hover:text-teal-700 transition-colors duration-200">Privacy Policy</a>

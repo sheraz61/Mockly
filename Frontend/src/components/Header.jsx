@@ -115,7 +115,7 @@ const Header = () => {
             </div>
             <div className="leading-none">
               <span className="text-lg font-bold text-slate-900 tracking-tight block">
-                Ascend
+                Mockly
               </span>
               <span className="text-[11px] text-slate-400 font-medium tracking-wide">
                 INTERVIEW COACHING

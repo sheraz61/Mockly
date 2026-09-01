@@ -74,7 +74,7 @@ const Login = () => {
               <path d="M4 18L10 8L14 14L20 4" stroke="#F59E0B" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
-          <span className="text-white font-bold text-lg tracking-tight">Ascend</span>
+          <span className="text-white font-bold text-lg tracking-tight">Mockly</span>
         </div>
 
         <div className="relative z-10 max-w-md">
@@ -100,7 +100,7 @@ const Login = () => {
         </div>
 
         <p className="relative z-10 text-xs text-slate-500">
-          © {new Date().getFullYear()} Ascend. All rights reserved.
+          © {new Date().getFullYear()} Mockly. All rights reserved.
         </p>
       </div>
 
@@ -110,7 +110,7 @@ const Login = () => {
           <div className="mb-8">
             <h1 className="text-2xl font-bold text-slate-900">Sign in to your account</h1>
             <p className="mt-2 text-sm text-slate-500">
-              New to Ascend?{' '}
+              New to Mockly?{' '}
               <Link to="/register" className="font-medium text-teal-700 hover:text-teal-800">
                 Create an account
               </Link>

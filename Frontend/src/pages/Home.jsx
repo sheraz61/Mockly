@@ -95,7 +95,7 @@ const Home = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14 max-w-2xl mx-auto">
             <span className="text-xs font-semibold text-teal-700 tracking-widest uppercase">
-              Why Ascend
+              Why Mockly
             </span>
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mt-3 mb-4">
               Everything you need to walk in prepared
@@ -258,7 +258,7 @@ const stats = [
 const testimonials = [
   {
     quote:
-      'Ascend helped me land my dream job at Google. The AI feedback was incredibly detailed and helped me identify my weak areas — I went from failing interviews to getting multiple offers.',
+      'Mockly helped me land my dream job at Google. The AI feedback was incredibly detailed and helped me identify my weak areas — I went from failing interviews to getting multiple offers.',
     name: 'Sarah Chen',
     role: 'Software Engineer at Google',
   },

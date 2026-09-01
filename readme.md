@@ -1,4 +1,4 @@
-# InterviewPrep 🎯
+# Mockly 🎯
 
 A full-stack AI-powered mock interview platform that helps developers practice technical interviews. The application uses Google Gemini AI to generate interview questions and provide intelligent feedback on candidate responses.
 

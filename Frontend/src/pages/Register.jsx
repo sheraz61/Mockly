@@ -129,7 +129,7 @@ const Register = () => {
               <path d="M4 18L10 8L14 14L20 4" stroke="#F59E0B" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
-          <span className="text-white font-bold text-lg tracking-tight">Ascend</span>
+          <span className="text-white font-bold text-lg tracking-tight">Mockly</span>
         </div>
 
         <div className="relative z-10 max-w-md">
@@ -147,7 +147,7 @@ const Register = () => {
         </div>
 
         <p className="relative z-10 text-xs text-slate-500">
-          © {new Date().getFullYear()} Ascend. All rights reserved.
+          © {new Date().getFullYear()} Mockly. All rights reserved.
         </p>
       </div>
 
