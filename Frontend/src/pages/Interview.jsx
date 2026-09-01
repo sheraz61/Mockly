@@ -30,6 +30,8 @@ const Interview = () => {
   });
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [isCustomTech, setIsCustomTech] = useState(false);
+  const [customTechValue, setCustomTechValue] = useState('');
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -98,6 +100,8 @@ const Interview = () => {
   ];
 
   const handleTechSelect = (tech) => {
+    setIsCustomTech(false);
+    setCustomTechValue('');
     setFormData(prev => ({ ...prev, technology: tech }));
     dispatch(clearInterviewError());
   };
@@ -241,6 +245,50 @@ const Interview = () => {
                     </div>
                   )}
                 </div>
+
+                {isCustomTech ? (
+                  <div className="mt-6 p-5 border border-teal-200 bg-teal-50/50 rounded-xl">
+                    <label className="block text-sm font-semibold text-slate-900 mb-2">Enter Custom Topic</label>
+                    <div className="flex gap-3">
+                      <input 
+                        type="text" 
+                        autoFocus
+                        placeholder="e.g., System Design, Kubernetes, Cyber Security..."
+                        value={customTechValue}
+                        onChange={(e) => {
+                          setCustomTechValue(e.target.value);
+                          setFormData(prev => ({...prev, technology: e.target.value}));
+                        }}
+                        className="flex-1 px-4 py-2.5 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-teal-600 bg-white"
+                      />
+                      <button 
+                        type="button" 
+                        onClick={() => {
+                          setIsCustomTech(false);
+                          setFormData(prev => ({...prev, technology: ''}));
+                          setCustomTechValue('');
+                        }}
+                        className="px-4 py-2.5 bg-white border border-slate-300 rounded-lg text-sm font-medium hover:bg-slate-50 text-slate-700 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => { 
+                      setIsCustomTech(true); 
+                      setFormData(prev => ({...prev, technology: ''})); 
+                      setSearchQuery('');
+                      dispatch(clearInterviewError()); 
+                    }}
+                    className="mt-6 w-full py-3.5 border-2 border-dashed border-slate-200 rounded-xl text-sm font-medium text-slate-500 hover:border-teal-300 hover:bg-teal-50/50 hover:text-teal-700 transition-all flex items-center justify-center gap-2 group"
+                  >
+                    <span className="w-6 h-6 rounded-md bg-slate-100 group-hover:bg-teal-100 flex items-center justify-center text-slate-400 group-hover:text-teal-600 transition-colors">+</span>
+                    Don't see your topic? Enter a custom one
+                  </button>
+                )}
               </div>
 
               {/* Difficulty Selection Section */}
