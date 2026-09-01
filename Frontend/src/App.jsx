@@ -7,7 +7,7 @@ import OTPVerification from './pages/OTPVerification';
 import Dashboard from './pages/Dashboard';
 import Interview from './pages/Interview';
 import ProtectedRoute from './components/ProtectedRoute';
-import ViewProfile from './pages/ViewProfile'
+import ViewProfile from './pages/ViewProfile';
 import UserProfile from './pages/UserProfile'
 import InterviewSession from './pages/InterviewSession';
 import InterviewResults from './pages/InterviewResults';

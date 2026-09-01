@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { getMyProfile, updateProfile, clearProfileError } from '../store/slices/profileSlice';
+import { getMyProfile, getUserProfile, updateProfile, clearProfileError, clearUserProfile } from '../store/slices/profileSlice';
 import ProfileForm from '../components/ProfileForm';
 import InterviewHistory from '../components/InterviewHistory';
+import { LineChart, Line, XAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import {
   FiEdit2,
   FiX,
@@ -27,6 +29,10 @@ const UserProfile = () => {
 
   useEffect(() => {
     dispatch(getMyProfile());
+    
+    return () => {
+      dispatch(clearUserProfile());
+    };
   }, [dispatch]);
 
   const handleSaveProfile = async (profileData) => {
@@ -71,17 +77,17 @@ const UserProfile = () => {
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
             <div className="flex items-center gap-5">
               <div className="w-20 h-20 rounded-full bg-teal-700 flex items-center justify-center text-white font-bold text-2xl shrink-0">
-                {user?.name?.charAt(0).toUpperCase()}
+                {(myProfile?.name || user?.name)?.charAt(0).toUpperCase()}
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-slate-900 mb-1">{user?.name}</h1>
-                <p className="text-slate-500 text-sm">{user?.email}</p>
+                <h1 className="text-2xl font-bold text-slate-900 mb-1">{myProfile?.name || user?.name}</h1>
+                {(myProfile?.email || user?.email) && <p className="text-slate-500 text-sm">{myProfile?.email || user?.email}</p>}
               </div>
             </div>
 
             <button
               onClick={() => setIsEditing(!isEditing)}
-              className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors duration-200 ${isEditing
+              className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors duration-200 shrink-0 ${isEditing
                   ? 'border border-slate-300 text-slate-700 hover:bg-slate-50'
                   : 'bg-slate-900 text-white hover:bg-slate-800'
                 }`}
@@ -131,7 +137,7 @@ const UserProfile = () => {
 
         {/* Tab Navigation */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-7">
-          <div className="flex gap-6 border-b border-slate-200">
+          <div className="flex gap-6 border-b border-slate-200 mb-7">
             <button
               onClick={() => setActiveTab('overview')}
               className={`relative pb-3.5 text-sm font-medium transition-colors duration-200 ${activeTab === 'overview' ? 'text-teal-700' : 'text-slate-500 hover:text-slate-700'
@@ -155,24 +161,22 @@ const UserProfile = () => {
           </div>
 
           {/* Tab Content */}
-          <div className="pt-7">
-            {activeTab === 'overview' && (
-              <div>
-                {isEditing ? (
-                  <ProfileForm
-                    profile={myProfile}
-                    onSave={handleSaveProfile}
-                    onCancel={() => setIsEditing(false)}
-                    loading={updating}
-                  />
-                ) : (
-                  <ProfileOverview profile={myProfile} />
-                )}
-              </div>
-            )}
+          {activeTab === 'overview' && (
+            <div>
+              {isEditing ? (
+                <ProfileForm
+                  profile={myProfile}
+                  onSave={handleSaveProfile}
+                  onCancel={() => setIsEditing(false)}
+                  loading={updating}
+                />
+              ) : (
+                <ProfileOverview profile={myProfile} interviews={interviews} />
+              )}
+            </div>
+          )}
 
-            {activeTab === 'interviews' && <InterviewHistory interviews={interviews} />}
-          </div>
+          {activeTab === 'interviews' && <InterviewHistory interviews={interviews} />}
         </div>
       </div>
     </div>
@@ -191,9 +195,53 @@ const StatCard = ({ icon: Icon, value, label, accent }) => (
   </div>
 );
 
+// Performance Chart Component
+const PerformanceChart = ({ interviews }) => {
+  const chartData = [...(interviews || [])]
+    .filter(i => i.overallScore != null)
+    .reverse()
+    .map((i, index) => ({
+      name: `Int ${index + 1}`,
+      score: i.overallScore
+    }));
+
+  if (chartData.length === 0) return null;
+
+  return (
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-10">
+      <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wide mb-4 flex items-center justify-between">
+        Performance Trend
+        <span className="text-xs text-teal-600 font-medium bg-teal-50 px-2 py-1 rounded-md lowercase tracking-normal">Recent</span>
+      </h3>
+      <div className="h-48 w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={chartData} margin={{ top: 5, right: 10, left: 10, bottom: 0 }}>
+            <XAxis dataKey="name" hide />
+            <Tooltip 
+              contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+              itemStyle={{ color: '#0f766e', fontWeight: 600 }}
+              formatter={(value) => [`${value}/10`, 'Score']}
+            />
+            <Line 
+              type="monotone" 
+              dataKey="score" 
+              stroke="#0f766e" 
+              strokeWidth={3}
+              dot={{ r: 4, fill: '#0f766e', strokeWidth: 0 }}
+              activeDot={{ r: 6, fill: '#0f766e', stroke: '#ccfbf1', strokeWidth: 4 }}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  );
+};
+
 // Profile Overview Component
-const ProfileOverview = ({ profile }) => (
-  <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+const ProfileOverview = ({ profile, interviews }) => (
+  <div>
+    <PerformanceChart interviews={interviews} />
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
     {/* Personal Information */}
     <div>
       <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wide mb-4">
@@ -244,6 +292,7 @@ const ProfileOverview = ({ profile }) => (
           )}
         </div>
       </div>
+    </div>
     </div>
   </div>
 );

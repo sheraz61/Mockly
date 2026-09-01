@@ -61,13 +61,35 @@ export const updateProfile = createAsyncThunk(
   }
 );
 
+// Get User Analytics
+export const getUserAnalytics = createAsyncThunk(
+  'profile/getUserAnalytics',
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await api.get(`/api/v1/interview/analytics`, {
+        headers: { 
+          Authorization: `Bearer ${token}`
+        }
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || 'Failed to load analytics'
+      );
+    }
+  }
+);
+
 const profileSlice = createSlice({
   name: 'profile',
   initialState: {
     myProfile: null,
     userProfile: null,
     interviews: [],
+    analytics: null,
     loading: false,
+    analyticsLoading: false,
     updating: false,
     error: null
   },
@@ -123,6 +145,18 @@ const profileSlice = createSlice({
       })
       .addCase(updateProfile.rejected, (state, action) => {
         state.updating = false;
+        state.error = action.payload;
+      })
+      // Get User Analytics
+      .addCase(getUserAnalytics.pending, (state) => {
+        state.analyticsLoading = true;
+      })
+      .addCase(getUserAnalytics.fulfilled, (state, action) => {
+        state.analyticsLoading = false;
+        state.analytics = action.payload.data;
+      })
+      .addCase(getUserAnalytics.rejected, (state, action) => {
+        state.analyticsLoading = false;
         state.error = action.payload;
       });
   }

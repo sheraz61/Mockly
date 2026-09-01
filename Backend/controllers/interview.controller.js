@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Interview from '../models/Interview.model.js';
 import { generateQuestions, evaluateCompleteInterview } from '../utils/gemini.js';
 
@@ -274,6 +275,81 @@ export const getInterviewHistory = async (req, res) => {
     console.error('Get history error:', error);
     res.status(500).json({ 
       message: "Failed to fetch history: " + error.message, 
+      success: false 
+    });
+  }
+};
+
+// GET ANALYTICS
+export const getAnalytics = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+    
+    // 1. Performance Over Time (Last 30 Days)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const performanceTrend = await Interview.aggregate([
+      { 
+        $match: { 
+          userId: userObjectId,
+          status: 'completed',
+          overallScore: { $exists: true },
+          createdAt: { $gte: thirtyDaysAgo }
+        } 
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          averageScore: { $avg: "$overallScore" },
+          interviewsCount: { $sum: 1 }
+        }
+      },
+      { $sort: { _id: 1 } }
+    ]);
+
+    // 2. Strengths by Technology
+    const techStrengths = await Interview.aggregate([
+      { 
+        $match: { 
+          userId: userObjectId,
+          status: 'completed',
+          overallScore: { $exists: true }
+        } 
+      },
+      {
+        $group: {
+          _id: "$technology",
+          averageScore: { $avg: "$overallScore" },
+          interviewsCount: { $sum: 1 }
+        }
+      },
+      { $sort: { averageScore: -1 } },
+      { $limit: 5 }
+    ]);
+
+    res.status(200).json({
+      success: true,
+      message: "Analytics fetched successfully",
+      data: {
+        performanceTrend: performanceTrend.map(item => ({
+          date: item._id,
+          score: Math.round(item.averageScore * 10) / 10,
+          count: item.interviewsCount
+        })),
+        techStrengths: techStrengths.map(item => ({
+          technology: item._id || 'General',
+          score: Math.round(item.averageScore * 10) / 10,
+          count: item.interviewsCount
+        }))
+      }
+    });
+  } catch (error) {
+    console.error('Get analytics error:', error);
+    res.status(500).json({ 
+      message: "Failed to fetch analytics: " + error.message, 
       success: false 
     });
   }
