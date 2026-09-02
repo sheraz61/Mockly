@@ -9,7 +9,9 @@ import {
   FiX, 
   FiCheckCircle, 
   FiAlertCircle,
-  FiCode
+  FiCode,
+  FiMic,
+  FiMicOff
 } from 'react-icons/fi';
 
 const InterviewSession = () => {
@@ -22,8 +24,11 @@ const InterviewSession = () => {
   const [conversation, setConversation] = useState([]);
   const [interviewCompleted, setInterviewCompleted] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  
   const textareaRef = useRef(null);
   const conversationEndRef = useRef(null);
+  const recognitionRef = useRef(null);
 
   const interviewData = location.state;
 
@@ -50,6 +55,62 @@ const InterviewSession = () => {
     // Smooth scroll instead of jump
     conversationEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }, [conversation, isTyping]);
+
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = true;
+      recognitionRef.current.interimResults = true;
+
+      recognitionRef.current.onresult = (event) => {
+        let finalTranscript = '';
+        
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            finalTranscript += event.results[i][0].transcript;
+          }
+        }
+        
+        if (finalTranscript) {
+          setCurrentAnswer((prev) => prev + (prev && !prev.endsWith(' ') ? ' ' : '') + finalTranscript);
+        }
+      };
+
+      recognitionRef.current.onerror = (event) => {
+        console.error("Speech recognition error", event.error);
+        setIsListening(false);
+      };
+
+      recognitionRef.current.onend = () => {
+        setIsListening(false);
+      };
+    }
+    
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    };
+  }, []);
+
+  const toggleListening = () => {
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+    } else {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.start();
+          setIsListening(true);
+        } catch (e) {
+          console.error("Error starting speech recognition", e);
+        }
+      } else {
+        alert("Your browser does not support Speech Recognition. Please use Google Chrome or Edge.");
+      }
+    }
+  };
 
   const handleSubmitAnswer = async () => {
     if (!currentAnswer.trim()) return;
@@ -260,7 +321,19 @@ const InterviewSession = () => {
                 rows={2}
                 disabled={loading}
               />
-              <div className="absolute right-3 bottom-3">
+              <div className="absolute right-3 bottom-3 flex items-center gap-2">
+                <button
+                  onClick={toggleListening}
+                  disabled={loading}
+                  title="Toggle voice input"
+                  className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
+                    isListening
+                      ? 'bg-red-500 text-white shadow-[0_0_0_4px_rgba(239,68,68,0.2)] animate-pulse'
+                      : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                  } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  {isListening ? <FiMicOff size={14} /> : <FiMic size={14} />}
+                </button>
                 <button
                   onClick={handleSubmitAnswer}
                   disabled={loading || !currentAnswer.trim()}
