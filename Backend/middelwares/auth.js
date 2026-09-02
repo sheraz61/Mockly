@@ -4,7 +4,7 @@ import User from '../models/User.model.js';
 const isAuth = async (req, res, next) => {
   try {
     // Get token from cookies or Authorization header
-    let token = req.cookies.token;
+    let token = req.cookies.access_token;
     
     // If no token in cookies, check Authorization header
     if (!token) {
@@ -22,7 +22,7 @@ const isAuth = async (req, res, next) => {
     }
 
     // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN || process.env.JWT_SECRET || 'access_secret');
     
     if (!decoded) {
       return res.status(401).json({

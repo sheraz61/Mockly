@@ -1,14 +1,15 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import api from '../../utils/axios';
+import Backend_URL from '../../server';
+const API_URL=`${Backend_URL}/api/v1/user`
 
-const API_URL = 'https://interviewprep.up.railway.app/api/v1/user';
 
 // Async thunk for LOGIN
 export const loginUser = createAsyncThunk(
   'auth/login',
   async ({ email, password }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_URL}/login`, {
+      const response = await api.post(`${API_URL}/login`, {
         email,
         password
       });
@@ -26,7 +27,7 @@ export const registerUser = createAsyncThunk(
   'auth/register',
   async ({ name, email, password }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_URL}/register`, {
+      const response = await api.post(`${API_URL}/register`, {
         name,
         email,
         password
@@ -40,14 +41,14 @@ export const registerUser = createAsyncThunk(
   }
 );
 
-// Async thunk for OTP verification - UPDATED to match backend
+// Async thunk for OTP verification / Activate User
 export const verifyOTP = createAsyncThunk(
   'auth/verify',
-  async ({ email, code }, { rejectWithValue }) => { // Changed 'otp' to 'code'
+  async ({ activationToken, activationCode }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_URL}/verify`, { // Changed endpoint
-        email,
-        code // Changed from 'otp' to 'code'
+      const response = await api.post(`${API_URL}/activate-user`, {
+        activationToken,
+        activationCode
       });
       return response.data;
     } catch (error) {
@@ -58,16 +59,18 @@ export const verifyOTP = createAsyncThunk(
   }
 );
 
-// Async thunk for resend OTP
-export const resendOTP = createAsyncThunk(
-  'auth/resend',
-  async (email, { rejectWithValue }) => {
+
+
+// Async thunk for LOGOUT
+export const logoutUser = createAsyncThunk(
+  'auth/logoutAPI',
+  async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_URL}/resend`, { email }); // Updated endpoint
+      const response = await api.get(`${API_URL}/logout`);
       return response.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || 'Failed to resend OTP'
+        error.response?.data?.message || 'Logout failed'
       );
     }
   }
@@ -82,7 +85,7 @@ const authSlice = createSlice({
     loading: false,
     error: null,
     pendingEmail: null,
-    otpResendCooldown: 0
+    activationToken: null
   },
   reducers: {
     logout: (state) => {
@@ -102,14 +105,7 @@ const authSlice = createSlice({
     },
     clearPendingEmail: (state) => {
       state.pendingEmail = null;
-    },
-    startOTPResendCooldown: (state) => {
-      state.otpResendCooldown = 60;
-    },
-    decrementOTPResendCooldown: (state) => {
-      if (state.otpResendCooldown > 0) {
-        state.otpResendCooldown -= 1;
-      }
+      state.activationToken = null;
     }
   },
   extraReducers: (builder) => {
@@ -123,11 +119,11 @@ const authSlice = createSlice({
         state.loading = false;
         state.isAuthenticated = true;
         state.user = action.payload.user;
-        state.token = action.payload.token;
+        state.token = action.payload.accessToken;
         state.error = null;
         
-        if (action.payload.token) {
-          localStorage.setItem('token', action.payload.token);
+        if (action.payload.accessToken) {
+          localStorage.setItem('token', action.payload.accessToken);
         }
       })
       .addCase(loginUser.rejected, (state, action) => {
@@ -145,7 +141,7 @@ const authSlice = createSlice({
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.pendingEmail = action.payload.email;
+        state.activationToken = action.payload.activationToken;
         state.error = null;
       })
       .addCase(registerUser.rejected, (state, action) => {
@@ -173,17 +169,6 @@ const authSlice = createSlice({
       .addCase(verifyOTP.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      })
-      
-      // Resend OTP cases
-      .addCase(resendOTP.pending, (state) => {
-        state.error = null;
-      })
-      .addCase(resendOTP.fulfilled, (state) => {
-        state.error = null;
-      })
-      .addCase(resendOTP.rejected, (state, action) => {
-        state.error = action.payload;
       });
   }
 });
@@ -192,9 +177,7 @@ export const {
   logout, 
   clearError, 
   setPendingEmail, 
-  clearPendingEmail,
-  startOTPResendCooldown,
-  decrementOTPResendCooldown
+  clearPendingEmail
 } = authSlice.actions;
 
 export default authSlice.reducer;
