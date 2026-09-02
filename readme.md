@@ -1,12 +1,8 @@
-<<<<<<< HEAD
-# Mockly - Complete Case Study
-## AI-Powered Technical Interview Platform
-=======
-# Mockly 🎯
+# Mockly - AI-Powered Technical Interview Platform
 
 A full-stack AI-powered mock interview platform that helps developers practice technical interviews. The application uses Google Gemini AI to generate interview questions and provide intelligent feedback on candidate responses.
 
-## ✨ Features
+## Features
 
 - **User Authentication**: Secure registration and login with OTP email verification
 - **AI-Powered Interviews**: Generate interview questions using Google Gemini AI based on technology and difficulty level
@@ -17,7 +13,7 @@ A full-stack AI-powered mock interview platform that helps developers practice t
 - **Dashboard**: Comprehensive overview of interview performance and statistics
 - **Email Notifications**: OTP verification and interview updates via email
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Backend
 - **Runtime**: Node.js
@@ -37,7 +33,7 @@ A full-stack AI-powered mock interview platform that helps developers practice t
 - **HTTP Client**: Axios
 - **Icons**: React Icons
 
-## 📋 Prerequisites
+## Prerequisites
 
 Before you begin, ensure you have the following installed:
 - **Node.js** (v18 or higher)
@@ -45,7 +41,7 @@ Before you begin, ensure you have the following installed:
 - **MongoDB** (local instance or MongoDB Atlas account)
 - **Google Gemini API Key** (from [Google AI Studio](https://makersuite.google.com/app/apikey))
 
-## 🚀 Installation
+## Installation
 
 ### 1. Clone the repository
 ```bash
@@ -86,7 +82,7 @@ Create a `.env` file in the `Frontend` directory (if needed):
 VITE_API_URL=http://localhost:5000/api/v1
 ```
 
-## 🏃 Running the Application
+## Running the Application
 
 ### Development Mode
 
@@ -119,7 +115,7 @@ npm run build
 npm run preview
 ```
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 interviewPrep/
@@ -205,7 +201,7 @@ interviewPrep/
 ### Dashboard Routes (`/api/v1/dashboard`)
 - Various dashboard statistics endpoints (Protected)
 
-## 🎯 Key Features Explained
+## Key Features Explained
 
 ### AI-Powered Question Generation
 The application uses Google Gemini AI to generate contextual interview questions based on:
@@ -224,7 +220,7 @@ After completing an interview, the AI evaluates:
 3. After verification, user can login
 4. JWT tokens stored in HTTP-only cookies for security
 
-## 🔒 Security Features
+## Security Features
 
 - Password hashing with bcrypt
 - JWT-based authentication
@@ -232,7 +228,7 @@ After completing an interview, the AI evaluates:
 - Protected routes on both frontend and backend
 - CORS configuration for secure cross-origin requests
 
-## 📝 Environment Variables
+## Environment Variables
 
 ### Backend `.env`
 | Variable | Description |
@@ -248,7 +244,7 @@ After completing an interview, the AI evaluates:
 | `EMAIL_PASS` | App-specific password for email |
 | `FRONTEND_URL` | Frontend application URL |
 
-## 🧪 Development
+## Development
 
 ### Available Scripts
 
@@ -262,7 +258,7 @@ After completing an interview, the AI evaluates:
 - `npm run preview` - Preview production build
 - `npm run lint` - Run ESLint
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please follow these steps:
 
@@ -272,16 +268,15 @@ Contributions are welcome! Please follow these steps:
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Google Gemini AI for interview question generation and evaluation
 - React and Vite communities for excellent tooling
 - Express.js and MongoDB for robust backend infrastructure
->>>>>>> 717e8e36a73d3a35306c65bcdb59568d2e0bb4aa
 
 ---
 
