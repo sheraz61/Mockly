@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Interview from '../models/Interview.model.js';
 import { generateQuestions, evaluateCompleteInterview } from '../utils/gemini.js';
 
@@ -24,7 +25,25 @@ export const startInterview = async (req, res) => {
         success: false
       });
     }
-    // Generate 5 questions using Gemini
+
+    // Check daily interview limit (3 per day)
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
+
+    const todayCount = await Interview.countDocuments({
+      userId,
+      createdAt: { $gte: todayStart, $lte: todayEnd }
+    });
+
+    if (todayCount >= 3) {
+      return res.status(429).json({
+        message: "Daily limit reached. You can take up to 3 interviews per day. Try again tomorrow.",
+        success: false
+      });
+    }
+    // Generate 8 questions using Gemini
     console.log('Generating questions...');
     const questionTexts = await generateQuestions(technology, difficulty);
     // Create new interview
@@ -32,13 +51,13 @@ export const startInterview = async (req, res) => {
       userId,
       technology,
       difficulty,
-      questions: questionTexts.map(q => ({ 
+      questions: questionTexts.map(q => ({
         question: q,
         answer: ""
       }))
     });
     await interview.save();
-    
+
     res.status(200).json({
       success: true,
       message: "Interview started successfully",
@@ -51,12 +70,12 @@ export const startInterview = async (req, res) => {
         difficulty: interview.difficulty
       }
     });
-    
+
   } catch (error) {
     console.error('Start interview error:', error);
-    res.status(500).json({ 
-      message: "Failed to start interview: " + error.message, 
-      success: false 
+    res.status(500).json({
+      message: "Failed to start interview: " + error.message,
+      success: false
     });
   }
 };
@@ -67,7 +86,7 @@ export const submitAnswer = async (req, res) => {
     const { answer } = req.body;
     const { id } = req.params;
     const userId = req.user.id;
-    
+
     // Validation
     if (!answer || !answer.trim()) {
       return res.status(400).json({
@@ -75,7 +94,7 @@ export const submitAnswer = async (req, res) => {
         success: false
       });
     }
-    
+
     // Find interview
     const interview = await Interview.findOne({
       _id: id,
@@ -89,7 +108,7 @@ export const submitAnswer = async (req, res) => {
       });
     }
     const currentIndex = interview.currentQuestionIndex;
-    
+
     // Check if current question index is valid
     if (currentIndex >= interview.questions.length) {
       return res.status(400).json({
@@ -97,18 +116,18 @@ export const submitAnswer = async (req, res) => {
         success: false
       });
     }
-    
+
     // Save answer for current question
     interview.questions[currentIndex].answer = answer.trim();
-    
+
     // Move to next question
     interview.currentQuestionIndex += 1;
-    
+
     // Check if interview completed
     if (interview.currentQuestionIndex >= interview.questions.length) {
       interview.status = 'completed';
       await interview.save();
-      
+
       return res.status(200).json({
         success: true,
         completed: true,
@@ -132,12 +151,12 @@ export const submitAnswer = async (req, res) => {
         totalQuestions: interview.questions.length
       }
     });
-    
+
   } catch (error) {
     console.error('Submit answer error:', error);
-    res.status(500).json({ 
-      message: "Failed to submit answer: " + error.message, 
-      success: false 
+    res.status(500).json({
+      message: "Failed to submit answer: " + error.message,
+      success: false
     });
   }
 };
@@ -153,7 +172,7 @@ export const getResults = async (req, res) => {
       userId: userId,
       status: 'completed'
     });
-    
+
     if (!interview) {
       return res.status(404).json({
         message: "Completed interview not found",
@@ -184,12 +203,12 @@ export const getResults = async (req, res) => {
         interview.technology,
         interview.difficulty
       );
-      
+
       // Save evaluation results
       interview.overallScore = evaluation.score;
       interview.feedback = evaluation.feedback;
       await interview.save();
-      
+
       res.status(200).json({
         success: true,
         message: "Interview evaluated successfully",
@@ -202,20 +221,20 @@ export const getResults = async (req, res) => {
           percentage: Math.round((evaluation.score / 10) * 100),
           totalQuestions: interview.questions.length,
           completedAt: interview.updatedAt,
-         
+
         }
       });
-      
+
     } catch (aiError) {
       console.error('AI Evaluation failed, using fallback:', aiError.message);
-      
+
       // Fallback evaluation
       const fallbackEvaluation = basicEvaluation(interview.questions, interview.technology, interview.difficulty);
-      
+
       interview.overallScore = fallbackEvaluation.score;
       interview.feedback = fallbackEvaluation.feedback;
       await interview.save();
-      
+
       res.status(200).json({
         success: true,
         message: "Interview evaluated successfully (fallback evaluation)",
@@ -231,12 +250,12 @@ export const getResults = async (req, res) => {
         }
       });
     }
-    
+
   } catch (error) {
     console.error('Get results error:', error);
-    res.status(500).json({ 
-      message: "Failed to get results: " + error.message, 
-      success: false 
+    res.status(500).json({
+      message: "Failed to get results: " + error.message,
+      success: false
     });
   }
 };
@@ -245,16 +264,16 @@ export const getResults = async (req, res) => {
 export const getInterviewHistory = async (req, res) => {
   try {
     const userId = req.user.id;
-    const interviews = await Interview.find({ 
+    const interviews = await Interview.find({
       userId: userId,
       status: 'completed',
       overallScore: { $exists: true }
     })
-    .select('technology difficulty overallScore createdAt')
-    .sort({ createdAt: -1 })
-    .limit(20); // Latest 20 interviews
-    
-    res.status(200).json({ 
+      .select('technology difficulty overallScore createdAt')
+      .sort({ createdAt: -1 })
+      .limit(20); // Latest 20 interviews
+
+    res.status(200).json({
       success: true,
       message: "Interview history fetched successfully",
       data: {
@@ -269,12 +288,87 @@ export const getInterviewHistory = async (req, res) => {
         totalInterviews: interviews.length
       }
     });
-    
+
   } catch (error) {
     console.error('Get history error:', error);
-    res.status(500).json({ 
-      message: "Failed to fetch history: " + error.message, 
-      success: false 
+    res.status(500).json({
+      message: "Failed to fetch history: " + error.message,
+      success: false
+    });
+  }
+};
+
+// GET ANALYTICS
+export const getAnalytics = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+
+    // 1. Performance Over Time (Last 30 Days)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const performanceTrend = await Interview.aggregate([
+      {
+        $match: {
+          userId: userObjectId,
+          status: 'completed',
+          overallScore: { $exists: true },
+          createdAt: { $gte: thirtyDaysAgo }
+        }
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          averageScore: { $avg: "$overallScore" },
+          interviewsCount: { $sum: 1 }
+        }
+      },
+      { $sort: { _id: 1 } }
+    ]);
+
+    // 2. Strengths by Technology
+    const techStrengths = await Interview.aggregate([
+      {
+        $match: {
+          userId: userObjectId,
+          status: 'completed',
+          overallScore: { $exists: true }
+        }
+      },
+      {
+        $group: {
+          _id: "$technology",
+          averageScore: { $avg: "$overallScore" },
+          interviewsCount: { $sum: 1 }
+        }
+      },
+      { $sort: { averageScore: -1 } },
+      { $limit: 5 }
+    ]);
+
+    res.status(200).json({
+      success: true,
+      message: "Analytics fetched successfully",
+      data: {
+        performanceTrend: performanceTrend.map(item => ({
+          date: item._id,
+          score: Math.round(item.averageScore * 10) / 10,
+          count: item.interviewsCount
+        })),
+        techStrengths: techStrengths.map(item => ({
+          technology: item._id || 'General',
+          score: Math.round(item.averageScore * 10) / 10,
+          count: item.interviewsCount
+        }))
+      }
+    });
+  } catch (error) {
+    console.error('Get analytics error:', error);
+    res.status(500).json({
+      message: "Failed to fetch analytics: " + error.message,
+      success: false
     });
   }
 };
@@ -283,29 +377,29 @@ export const getInterviewHistory = async (req, res) => {
 function basicEvaluation(questions, technology, difficulty) {
   let totalScore = 0;
   let answeredCount = 0;
-  
+
   questions.forEach(q => {
     if (q.answer && q.answer.trim()) {
       answeredCount++;
       const answerLength = q.answer.trim().length;
-      
+
       // Length-based scoring
       if (answerLength > 20) totalScore += 2;
       if (answerLength > 50) totalScore += 2;
       if (answerLength > 100) totalScore += 1;
-      
+
       // Technical keywords
       const keywords = ['function', 'variable', 'object', 'method', 'component', 'state', 'event', 'data', 'API'];
-      const keywordCount = keywords.filter(keyword => 
+      const keywordCount = keywords.filter(keyword =>
         q.answer.toLowerCase().includes(keyword)
       ).length;
       totalScore += Math.min(keywordCount, 3);
     }
   });
-  
-  const averageScore = answeredCount > 0 ? 
+
+  const averageScore = answeredCount > 0 ?
     Math.min((totalScore / (answeredCount * 8)) * 10, 10) : 0;
-  
+
   let feedback;
   if (averageScore >= 8) {
     feedback = `Excellent ${difficulty} level ${technology} performance! Strong technical knowledge demonstrated with comprehensive answers. Shows readiness for the role.`;
@@ -316,7 +410,7 @@ function basicEvaluation(questions, technology, difficulty) {
   } else {
     feedback = `Basic performance in ${difficulty} level ${technology} interview. Focus on fundamental concepts and practice explaining technical topics in more detail.`;
   }
-  
+
   return {
     score: Math.round(averageScore * 10) / 10,
     feedback

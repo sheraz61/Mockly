@@ -1,7 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import api from '../../utils/axios';
+import Backend_URL from '../../server';
+const API_URL = `${Backend_URL}/api/v1/dashboard`;
 
-const API_URL = 'https://interviewprep.up.railway.app/api/v1/dashboard';
 
 // Async thunk for getting all user profiles
 export const getAllUserProfiles = createAsyncThunk(
@@ -12,7 +13,7 @@ export const getAllUserProfiles = createAsyncThunk(
       if (filters.techStack) params.append('techStack', filters.techStack);
       if (filters.experience) params.append('experience', filters.experience);
 
-      const response = await axios.get(`${API_URL}/users?${params.toString()}`);
+      const response = await api.get(`${API_URL}/users?${params.toString()}`);
       return response.data;
     } catch (error) {
       return rejectWithValue(
