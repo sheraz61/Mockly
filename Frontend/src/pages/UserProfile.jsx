@@ -29,7 +29,7 @@ const UserProfile = () => {
 
   useEffect(() => {
     dispatch(getMyProfile());
-    
+
     return () => {
       dispatch(clearUserProfile());
     };
@@ -44,9 +44,11 @@ const UserProfile = () => {
     }
   };
 
+
+
   const calculateStats = () => {
     const totalInterviews = interviews.length;
-    const completedInterviews = interviews.length;
+    const completedInterviews = interviews.filter(i => i.overallScore != null).length;
     const averageScore =
       interviews.length > 0
         ? Math.round((interviews.reduce((sum, i) => sum + (i.overallScore || 0), 0) / interviews.length) * 10) / 10
@@ -88,8 +90,8 @@ const UserProfile = () => {
             <button
               onClick={() => setIsEditing(!isEditing)}
               className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors duration-200 shrink-0 ${isEditing
-                  ? 'border border-slate-300 text-slate-700 hover:bg-slate-50'
-                  : 'bg-slate-900 text-white hover:bg-slate-800'
+                ? 'border border-slate-300 text-slate-700 hover:bg-slate-50'
+                : 'bg-slate-900 text-white hover:bg-slate-800'
                 }`}
             >
               {isEditing ? (
@@ -176,7 +178,12 @@ const UserProfile = () => {
             </div>
           )}
 
-          {activeTab === 'interviews' && <InterviewHistory interviews={interviews} />}
+          {activeTab === 'interviews' && (
+            <div>
+              <h2 className="text-xl font-bold text-slate-900 mb-6">Interview History</h2>
+              <InterviewHistory interviews={interviews} />
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -205,7 +212,24 @@ const PerformanceChart = ({ interviews }) => {
       score: i.overallScore
     }));
 
-  if (chartData.length === 0) return null;
+  if (chartData.length === 0) {
+    return (
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-10">
+        <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wide mb-4">
+          Performance Trend
+        </h3>
+        <div className="flex flex-col items-center justify-center py-10 text-slate-500">
+          <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-3">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+            </svg>
+          </div>
+          <p className="text-sm font-medium">No performance data yet</p>
+          <p className="text-xs mt-1">Complete an interview to see your trend</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-10">
@@ -217,15 +241,15 @@ const PerformanceChart = ({ interviews }) => {
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 5, right: 10, left: 10, bottom: 0 }}>
             <XAxis dataKey="name" hide />
-            <Tooltip 
+            <Tooltip
               contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
               itemStyle={{ color: '#0f766e', fontWeight: 600 }}
               formatter={(value) => [`${value}/10`, 'Score']}
             />
-            <Line 
-              type="monotone" 
-              dataKey="score" 
-              stroke="#0f766e" 
+            <Line
+              type="monotone"
+              dataKey="score"
+              stroke="#0f766e"
               strokeWidth={3}
               dot={{ r: 4, fill: '#0f766e', strokeWidth: 0 }}
               activeDot={{ r: 6, fill: '#0f766e', stroke: '#ccfbf1', strokeWidth: 4 }}
@@ -242,57 +266,57 @@ const ProfileOverview = ({ profile, interviews }) => (
   <div>
     <PerformanceChart interviews={interviews} />
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-    {/* Personal Information */}
-    <div>
-      <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wide mb-4">
-        Personal information
-      </h3>
-      <div className="space-y-1">
-        <InfoItem icon={FiBriefcase} label="Current role" value={profile?.profile?.currentRole} />
-        <InfoItem icon={FiLayers} label="Experience" value={profile?.profile?.experience} />
-        <InfoItem icon={FiMapPin} label="Location" value={profile?.profile?.location} />
-        <InfoItem icon={FiGrid} label="Tech stack" value={profile?.profile?.techStack} />
-        <InfoItem icon={FiAward} label="Skills" value={profile?.profile?.skills} />
-      </div>
-    </div>
-
-    {/* Bio & Links */}
-    <div>
-      <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wide mb-4">
-        About &amp; links
-      </h3>
-      <div className="space-y-4">
-        <div>
-          <label className="block text-xs font-medium text-slate-500 mb-2">Bio</label>
-          <p className="text-slate-700 text-sm bg-slate-50 border border-slate-100 p-4 rounded-lg min-h-[100px] leading-relaxed">
-            {profile?.profile?.bio || 'No bio provided yet.'}
-          </p>
-        </div>
-
-        <div className="flex gap-3">
-          {profile?.profile?.linkedin && (
-            <a
-              href={profile.profile.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-teal-700 border border-slate-200 hover:border-teal-200 px-3.5 py-2 rounded-lg transition-colors duration-200"
-            >
-              <FiLinkedin size={15} /> LinkedIn
-            </a>
-          )}
-          {profile?.profile?.github && (
-            <a
-              href={profile.profile.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-teal-700 border border-slate-200 hover:border-teal-200 px-3.5 py-2 rounded-lg transition-colors duration-200"
-            >
-              <FiGithub size={15} /> GitHub
-            </a>
-          )}
+      {/* Personal Information */}
+      <div>
+        <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wide mb-4">
+          Personal information
+        </h3>
+        <div className="space-y-1">
+          <InfoItem icon={FiBriefcase} label="Current role" value={profile?.profile?.currentRole} />
+          <InfoItem icon={FiLayers} label="Experience" value={profile?.profile?.experience} />
+          <InfoItem icon={FiMapPin} label="Location" value={profile?.profile?.location} />
+          <InfoItem icon={FiGrid} label="Tech stack" value={profile?.profile?.techStack} />
+          <InfoItem icon={FiAward} label="Skills" value={profile?.profile?.skills} />
         </div>
       </div>
-    </div>
+
+      {/* Bio & Links */}
+      <div>
+        <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wide mb-4">
+          About &amp; links
+        </h3>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-xs font-medium text-slate-500 mb-2">Bio</label>
+            <p className="text-slate-700 text-sm bg-slate-50 border border-slate-100 p-4 rounded-lg min-h-[100px] leading-relaxed">
+              {profile?.profile?.bio || 'No bio provided yet.'}
+            </p>
+          </div>
+
+          <div className="flex gap-3">
+            {profile?.profile?.linkedin && (
+              <a
+                href={profile.profile.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-teal-700 border border-slate-200 hover:border-teal-200 px-3.5 py-2 rounded-lg transition-colors duration-200"
+              >
+                <FiLinkedin size={15} /> LinkedIn
+              </a>
+            )}
+            {profile?.profile?.github && (
+              <a
+                href={profile.profile.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-teal-700 border border-slate-200 hover:border-teal-200 px-3.5 py-2 rounded-lg transition-colors duration-200"
+              >
+                <FiGithub size={15} /> GitHub
+              </a>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 );

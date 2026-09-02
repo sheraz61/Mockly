@@ -183,7 +183,12 @@ const ViewProfile = () => {
             </div>
           )}
 
-          {activeTab === 'interviews' && <InterviewHistory interviews={interviews} isPublic={true} />}
+          {activeTab === 'interviews' && (
+            <div>
+              <h2 className="text-xl font-bold text-slate-900 mb-6">Interview History</h2>
+              <InterviewHistory interviews={interviews} isPublic={true} />
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -211,7 +216,24 @@ const PerformanceChart = ({ interviews }) => {
       score: i.overallScore
     }));
 
-  if (chartData.length === 0) return null;
+  if (chartData.length === 0) {
+    return (
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-10">
+        <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wide mb-4">
+          Performance Trend
+        </h3>
+        <div className="flex flex-col items-center justify-center py-10 text-slate-500">
+          <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-3">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+            </svg>
+          </div>
+          <p className="text-sm font-medium">No performance data yet</p>
+          <p className="text-xs mt-1">This user hasn't completed any tracked interviews</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-10">

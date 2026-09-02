@@ -7,11 +7,11 @@ const API_URL = `${Backend_URL}/api/v1/user`;
 // Get user's own profile
 export const getMyProfile = createAsyncThunk(
   'profile/getMyProfile',
-  async ( { rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem('token');
       const response = await api.get(`${API_URL}/my-profile`, {
-        headers: { 
+        headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
@@ -47,7 +47,7 @@ export const updateProfile = createAsyncThunk(
     try {
       const token = localStorage.getItem('token');
       const response = await api.put(`${API_URL}/profile`, profileData, {
-        headers: { 
+        headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
@@ -68,7 +68,7 @@ export const getUserAnalytics = createAsyncThunk(
     try {
       const token = localStorage.getItem('token');
       const response = await api.get(`/api/v1/interview/analytics`, {
-        headers: { 
+        headers: {
           Authorization: `Bearer ${token}`
         }
       });
