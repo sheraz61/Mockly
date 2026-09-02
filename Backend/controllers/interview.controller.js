@@ -25,7 +25,25 @@ export const startInterview = async (req, res) => {
         success: false
       });
     }
-    // Generate 5 questions using Gemini
+
+    // Check daily interview limit (3 per day)
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
+
+    const todayCount = await Interview.countDocuments({
+      userId,
+      createdAt: { $gte: todayStart, $lte: todayEnd }
+    });
+
+    if (todayCount >= 3) {
+      return res.status(429).json({
+        message: "Daily limit reached. You can take up to 3 interviews per day. Try again tomorrow.",
+        success: false
+      });
+    }
+    // Generate 8 questions using Gemini
     console.log('Generating questions...');
     const questionTexts = await generateQuestions(technology, difficulty);
     // Create new interview

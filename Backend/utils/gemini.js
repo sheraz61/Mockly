@@ -13,10 +13,10 @@ const jsonModel = genAI.getGenerativeModel({
 // Generate questions
 export const generateQuestions = async (tech, level) => {
   try {
-    const prompt = `Generate 5 ${level} level ${tech} interview questions. 
+    const prompt = `Generate 8 ${level} level ${tech} interview questions. 
 The questions should be 1-2 lines long each.
 Return the output strictly as a JSON array of strings.
-Example: ["Question 1", "Question 2", "Question 3", "Question 4", "Question 5"]`;
+Example: ["Question 1", "Question 2", "Question 3", "Question 4", "Question 5", "Question 6", "Question 7", "Question 8"]`;
     
     const result = await jsonModel.generateContent(prompt);
     const text = result.response.text();
@@ -25,7 +25,7 @@ Example: ["Question 1", "Question 2", "Question 3", "Question 4", "Question 5"]`
     const questionsArray = JSON.parse(text);
     
     // Ensure we only return 5 strings
-    return questionsArray.slice(0, 5);
+    return questionsArray.slice(0, 8);
   } catch (error) {
     console.error('Generate questions error:', error);
     throw error;
