@@ -74,131 +74,117 @@ const UserProfile = () => {
   return (
     <div className="min-h-screen bg-slate-50 py-10">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
-        {/* Header Section */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-7 mb-6">
-          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-            <div className="flex items-center gap-5">
-              <div className="w-20 h-20 rounded-full bg-teal-700 flex items-center justify-center text-white font-bold text-2xl shrink-0">
-                {(myProfile?.name || user?.name)?.charAt(0).toUpperCase()}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          
+          {/* Left Column */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-7 sticky top-24">
+              <div className="flex flex-col items-center text-center mb-6">
+                <div className="w-24 h-24 rounded-full bg-teal-700 flex items-center justify-center text-white font-bold text-3xl mb-4 shrink-0">
+                  {(myProfile?.name || user?.name)?.charAt(0).toUpperCase()}
+                </div>
+                <h1 className="text-xl font-bold text-slate-900 mb-1">{myProfile?.name || user?.name}</h1>
+                {(myProfile?.email || user?.email) && <p className="text-slate-500 text-sm mb-5">{myProfile?.email || user?.email}</p>}
+                
+                <button
+                  onClick={() => setIsEditing(!isEditing)}
+                  className={`w-full inline-flex justify-center items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors duration-200 shrink-0 ${isEditing
+                    ? 'border border-slate-300 text-slate-700 hover:bg-slate-50'
+                    : 'bg-slate-900 text-white hover:bg-slate-800'
+                    }`}
+                >
+                  {isEditing ? (
+                    <>
+                      <FiX size={15} /> Cancel editing
+                    </>
+                  ) : (
+                    <>
+                      <FiEdit2 size={15} /> Edit profile
+                    </>
+                  )}
+                </button>
               </div>
-              <div>
-                <h1 className="text-2xl font-bold text-slate-900 mb-1">{myProfile?.name || user?.name}</h1>
-                {(myProfile?.email || user?.email) && <p className="text-slate-500 text-sm">{myProfile?.email || user?.email}</p>}
+
+              <div className="border-t border-slate-100 pt-6 space-y-4">
+                <StatRow icon={FiGrid} label="Total interviews" value={stats.totalInterviews} />
+                <StatRow icon={FiClock} label="Completed" value={stats.completedInterviews} />
+                <StatRow icon={FiAward} label="Average score" value={`${stats.averageScore}/10`} />
               </div>
             </div>
-
-            <button
-              onClick={() => setIsEditing(!isEditing)}
-              className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors duration-200 shrink-0 ${isEditing
-                ? 'border border-slate-300 text-slate-700 hover:bg-slate-50'
-                : 'bg-slate-900 text-white hover:bg-slate-800'
-                }`}
-            >
-              {isEditing ? (
-                <>
-                  <FiX size={15} /> Cancel editing
-                </>
-              ) : (
-                <>
-                  <FiEdit2 size={15} /> Edit profile
-                </>
-              )}
-            </button>
           </div>
-        </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-          <StatCard
-            icon={FiGrid}
-            value={stats.totalInterviews}
-            label="Total interviews"
-            accent="bg-slate-900"
-          />
-          <StatCard
-            icon={FiClock}
-            value={stats.completedInterviews}
-            label="Completed"
-            accent="bg-teal-700"
-          />
-          <StatCard
-            icon={FiAward}
-            value={`${stats.averageScore}/10`}
-            label="Average score"
-            accent="bg-amber-600"
-          />
-        </div>
+          {/* Right Column */}
+          <div className="lg:col-span-2">
+            {error && (
+              <div className="flex items-start gap-2.5 bg-rose-50 border border-rose-200 text-rose-700 px-5 py-3.5 rounded-lg mb-6 text-sm">
+                <FiAlertCircle className="shrink-0 mt-0.5" size={16} />
+                {error}
+              </div>
+            )}
 
-        {/* Error Message */}
-        {error && (
-          <div className="flex items-start gap-2.5 bg-rose-50 border border-rose-200 text-rose-700 px-5 py-3.5 rounded-lg mb-6 text-sm">
-            <FiAlertCircle className="shrink-0 mt-0.5" size={16} />
-            {error}
-          </div>
-        )}
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
+              {/* Tab Navigation */}
+              <div className="flex gap-6 border-b border-slate-200 mb-8">
+                <button
+                  onClick={() => setActiveTab('overview')}
+                  className={`relative pb-3.5 text-sm font-medium transition-colors duration-200 ${activeTab === 'overview' ? 'text-teal-700' : 'text-slate-500 hover:text-slate-700'
+                    }`}
+                >
+                  Overview
+                  {activeTab === 'overview' && (
+                    <span className="absolute left-0 right-0 -bottom-[1px] h-0.5 bg-teal-700 rounded-full" />
+                  )}
+                </button>
+                <button
+                  onClick={() => setActiveTab('interviews')}
+                  className={`relative pb-3.5 text-sm font-medium transition-colors duration-200 ${activeTab === 'interviews' ? 'text-teal-700' : 'text-slate-500 hover:text-slate-700'
+                    }`}
+                >
+                  Interview history
+                  {activeTab === 'interviews' && (
+                    <span className="absolute left-0 right-0 -bottom-[1px] h-0.5 bg-teal-700 rounded-full" />
+                  )}
+                </button>
+              </div>
 
-        {/* Tab Navigation */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-7">
-          <div className="flex gap-6 border-b border-slate-200 mb-7">
-            <button
-              onClick={() => setActiveTab('overview')}
-              className={`relative pb-3.5 text-sm font-medium transition-colors duration-200 ${activeTab === 'overview' ? 'text-teal-700' : 'text-slate-500 hover:text-slate-700'
-                }`}
-            >
-              Overview
+              {/* Tab Content */}
               {activeTab === 'overview' && (
-                <span className="absolute left-0 right-0 -bottom-[1px] h-0.5 bg-teal-700 rounded-full" />
+                <div className="animate-fade-in">
+                  {isEditing ? (
+                    <ProfileForm
+                      profile={myProfile}
+                      onSave={handleSaveProfile}
+                      onCancel={() => setIsEditing(false)}
+                      loading={updating}
+                    />
+                  ) : (
+                    <ProfileOverview profile={myProfile} interviews={interviews} />
+                  )}
+                </div>
               )}
-            </button>
-            <button
-              onClick={() => setActiveTab('interviews')}
-              className={`relative pb-3.5 text-sm font-medium transition-colors duration-200 ${activeTab === 'interviews' ? 'text-teal-700' : 'text-slate-500 hover:text-slate-700'
-                }`}
-            >
-              Interview history
+
               {activeTab === 'interviews' && (
-                <span className="absolute left-0 right-0 -bottom-[1px] h-0.5 bg-teal-700 rounded-full" />
+                <div className="animate-fade-in">
+                  <InterviewHistory interviews={interviews} />
+                </div>
               )}
-            </button>
+            </div>
           </div>
-
-          {/* Tab Content */}
-          {activeTab === 'overview' && (
-            <div>
-              {isEditing ? (
-                <ProfileForm
-                  profile={myProfile}
-                  onSave={handleSaveProfile}
-                  onCancel={() => setIsEditing(false)}
-                  loading={updating}
-                />
-              ) : (
-                <ProfileOverview profile={myProfile} interviews={interviews} />
-              )}
-            </div>
-          )}
-
-          {activeTab === 'interviews' && (
-            <div>
-              <h2 className="text-xl font-bold text-slate-900 mb-6">Interview History</h2>
-              <InterviewHistory interviews={interviews} />
-            </div>
-          )}
         </div>
       </div>
     </div>
   );
 };
 
-const StatCard = ({ icon: Icon, value, label, accent }) => (
-  <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex items-center gap-4">
-    <div className={`w-11 h-11 rounded-lg ${accent} flex items-center justify-center shrink-0`}>
-      <Icon className="text-white" size={18} />
+const StatRow = ({ icon: Icon, label, value }) => (
+  <div className="flex items-center justify-between">
+    <div className="flex items-center gap-3 text-slate-600">
+      <div className="w-8 h-8 rounded-md bg-slate-50 border border-slate-100 flex items-center justify-center">
+        <Icon size={14} className="text-teal-700" />
+      </div>
+      <span className="text-sm font-medium">{label}</span>
     </div>
-    <div>
-      <div className="text-2xl font-bold text-slate-900 leading-none">{value}</div>
-      <div className="text-slate-500 text-sm mt-1">{label}</div>
-    </div>
+    <span className="font-bold text-slate-900">{value}</span>
   </div>
 );
 
@@ -214,12 +200,12 @@ const PerformanceChart = ({ interviews }) => {
 
   if (chartData.length === 0) {
     return (
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-10">
+      <div className="mb-10">
         <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wide mb-4">
           Performance Trend
         </h3>
-        <div className="flex flex-col items-center justify-center py-10 text-slate-500">
-          <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-3">
+        <div className="flex flex-col items-center justify-center py-10 bg-slate-50 rounded-xl border border-dashed border-slate-200 text-slate-500">
+          <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center mb-3 shadow-sm border border-slate-100">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
             </svg>
@@ -232,12 +218,12 @@ const PerformanceChart = ({ interviews }) => {
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-10">
-      <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wide mb-4 flex items-center justify-between">
+    <div className="mb-10">
+      <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wide mb-6 flex items-center justify-between">
         Performance Trend
         <span className="text-xs text-teal-600 font-medium bg-teal-50 px-2 py-1 rounded-md lowercase tracking-normal">Recent</span>
       </h3>
-      <div className="h-48 w-full">
+      <div className="h-56 w-full -ml-4">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 5, right: 10, left: 10, bottom: 0 }}>
             <XAxis dataKey="name" hide />
