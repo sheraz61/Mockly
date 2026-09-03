@@ -33,7 +33,7 @@ const Footer = () => {
             <p className="text-slate-500 text-sm leading-relaxed mb-6 max-w-sm">
               Master your interview skills with AI-powered practice sessions, real-time feedback, and comprehensive preparation tools built for serious candidates.
             </p>
-            
+
             {/* Social Links */}
             <div className="flex gap-4">
               <a
@@ -53,7 +53,7 @@ const Footer = () => {
                 <FaGithub size={18} />
               </a>
               <a
-                href="https://leetcode.com/u/Sheraz6_1/"
+                href="https://leetcode.com/u/Sheraz1_2/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-50 text-slate-400 hover:bg-orange-50 hover:text-orange-500 transition-colors duration-200 border border-slate-100"
@@ -125,7 +125,7 @@ const Footer = () => {
             </ul>
           </div>
         </div>
-        
+
         {/* Bottom Bar */}
         <div className="border-t border-slate-200 pt-8 mt-12 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-slate-500 text-sm text-center md:text-left">
